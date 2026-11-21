@@ -1,11 +1,11 @@
 """
     Tests for the Q-learning agent.
 
-    # Run all test :
-          python -m pytest tests -v
-
-    # Run individual test
-         python -m pytest tests.test_q_learning 
+    # Run all test 
+        python -m pytest tests -v
+    
+       # Run individual test
+            python -m pytest tests/test_q_learning.py -v
 
 
 """

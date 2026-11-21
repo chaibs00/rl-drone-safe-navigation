@@ -3,9 +3,9 @@
 
    # Run all test 
         python -m pytest tests -v
-
-   # Run individual test
-        python -m pytest tests.test_value_iteration 
+   
+      # Run individual test
+           python -m pytest tests/test_value_iteration.py -v 
 
 """
 

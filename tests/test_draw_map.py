@@ -1,11 +1,11 @@
 """
     Testing the GridMap implementation.
 
-    # Run all tests
+    # Run all test 
         python -m pytest tests -v
     
     # Run individual test
-        python -m tests.test_draw_map
+        python -m pytest tests/test_draw_map.py -v
 """
 
 
