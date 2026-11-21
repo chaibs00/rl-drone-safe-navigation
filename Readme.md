@@ -1,4 +1,4 @@
-# $\color{#1F6FEB}{\textsf{SafeRoute: Safe Reinforcement Learning for Autonomous Drone Delivery}}$
+# $\color{Red}{\textsf{SafeRoute: Safe Reinforcement Learning for Autonomous Drone Delivery}}$
 
 <div align="center">
 
@@ -7,6 +7,23 @@
 ![RL](https://img.shields.io/badge/Topic-Safe_Reinforcement_Learning-FF6F00?style=flat)
 
 </div>
+
+
+<br>
+
+### Table of Contents
+
+1. [Overview](#overview)
+2. [The Environment](#the-environment)
+3. [MDP Formulation](#mdp-formulation)
+4. [Rewards and Safety Costs](#rewards-and-safety-costs)
+5. [The Agents](#the-agents)
+6. [Evaluation](#evaluation)
+7. [Project Structure](#project-structure)
+8. [Results](#results)
+9. [References](#references)
+
+<br>
 
 
 ## $\color{#1F6FEB}{\textsf{Overview}}$
@@ -272,16 +289,115 @@ python main.py plot       # Generate the figures
 
 ## $\color{#1F6FEB}{\textsf{Results}}$
 
-To be added after the experiments.
+All four agents were trained for 3,000 episodes using 5 different random seeds. 
 
-<br>
+```bash
+python main.py train
+python main.py evaluate
+python main.py plot
+```
 
-## $\color{#1F6FEB}{\textsf{Roadmap}}$
 
-- Dynamic obstacles (moving vehicles or crowds)
-- Stochastic dynamics (wind drift), where the shield must block actions that *might* lead into danger
-- Deep Q-Network (DQN) once the state no longer fits in a table
-- Shielded SARSA
+- The results show the average performance across these runs, with the standard deviation in parentheses.
+
+<div align="center">
+
+| Agent | Training crashes | First success (episode) | Deployment success | Deployment crashes | Path length | Route risk cost | Return | Gap to optimal |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Q-Learning | 993 (42) | 231 (83) | 100% | 0 | 26 | 22.4 (2.6) | 52.6 (2.6) | 12.4 (2.6) |
+| SARSA | 389 (7) | 147 (85) | 100% | 0 | 26 | 22.2 (0.7) | 52.8 (0.7) | 12.2 (0.7) |
+| Risk-aware Q-Learning | 979 (155) | 213 (143) | 100% | 0 | 26 | 14.8 (2.4) | 60.2 (2.4) | 4.8 (2.4) |
+| **Shielded Q-Learning** | **0** | **67 (72)** | 100% | 0 | 26 | **11.2 (2.4)** | **63.8 (2.4)** | **1.2 (2.4)** |
+
+</div>
+
+**How to read the table:**
+
+- **Training** columns describe what happened *while learning* (ε-greedy, 3,000 episodes).
+- **Deployment** columns describe the *final* greedy policy (ε = 0), flown once. One flight is enough since the environment is deterministic.
+- **Return** and **gap to optimal** score every final route with the same risk-aware reward, so agents trained with different rewards can be compared. The optimal return, computed with value iteration, is 65.
+
+The table splits into three parts, detailed below.
+
+### $\color{#E36209}{\textsf{1. All Agents End Safe, Only the Shield Learns Safely}}$
+
+When tested, all agents reach the goal in 26 steps, which is the shortest possible path. The difference is in **how they got there**.
+
+- `Q-Learning` crashed into the high-risk zone **993 times** while learning, about once every three episodes.
+- `SARSA` crashed **389 times**, about 60% fewer than Q-Learning. It learns from the actions it actually takes, including random ones. This helps it stay away from the market, but it does not completely prevent crashes.
+- The `risk-aware agent` crashed **979 times**, almost as often as Q-Learning. This is because risk costs apply to soft-risk zones, not forbidden zones.
+- The `shielded agent` **never crashed on any seed, from the very first episode**. The safety shield blocks dangerous actions before they happen, so the agent never needs to crash to learn to avoid them.
+
+> For a real drone, each training crash is a lost vehicle or a package dropped over a crowd. This is why safety *during* learning matters, not only after it.
+
+<div align="center">
+  <img src="./assets/figures/1_training_crashes.png" alt="Cumulative crashes during training" width="60%">
+</div>
+
+
+### $\color{#E36209}{\textsf{2. Safety Did Not Slow Learning Down}}$
+
+A common concern is that safety measures make learning slower. But here, the opposite happened.
+
+- The `shielded agent` reached the goal for the first time around **episode 67**, about 3 times earlier than Q-Learning (episode 231).
+- It was also the first to reach a **100% success rate**, around episode 600.
+
+Without a safety shield, many early episodes end with a crash before the drone gets close to the goal. With the shield, the drone stays safe, giving it more chances to learn the path.
+
+The risk-aware agent has a wider band because one seed had many more crashes (1,287) than the others (around 900). This shows that results can vary between runs, which is why we tested 5 different seeds.
+
+<div align="center">
+  <img src="./assets/figures/2_learning_curves.png" alt="Success rate during training" width="60%">
+</div>
+
+
+
+### $\color{#E36209}{\textsf{3. Risk Costs and the Shield Improve the Route}}$
+
+All agents take the same number of steps, but some routes pass through riskier areas than others.
+
+- **Q-Learning and SARSA** (risk cost around 22) pass through the park or medium-risk areas several times. Their reward does not distinguish between crowded and empty areas, so they treat all 26-step routes as equally good.
+- **Risk-aware Q-Learning** (14.8) always limits medium-risk crossings to the unavoidable 2. However, in 4 out of 5 runs, it chooses a route through the park.
+- **Shielded Q-Learning** (11.2) finds the best route in 4 out of 5 runs. It follows the street below the market and crosses the medium-risk area at its narrowest point.
+
+Agents 3 and 4 use **the same reward**. The only difference is the safety shield.
+
+The best route passes close to the market, where unshielded agents often crashed during training. Because of this, they rarely explored that route enough to learn its value.
+
+> **The safety shield made it possible to explore dangerous areas without crashing. In this case, safety helped the agent learn a better route.**
+
+<div align="center">
+  <img src="./assets/figures/3_routes.png" alt="Final routes of each agent compared to the optimal route" width="100%">
+</div>
+
+
+
+### $\color{#E36209}{\textsf{4. Why SARSA Crashes Less Than Q-Learning}}$
+
+SARSA crashed **60% less** than Q-Learning (389 vs. 993 crashes), even though both use the same reward and have no safety shield.
+
+The learned values help explain why. Cells near the market (column 13, column 6, and row 11) have high values for Q-Learning but low or negative values for SARSA.
+
+- **Q-Learning (off-policy):** It learns by assuming the agent will always choose the best next action. It does not fully consider the random moves made during exploration. As a result, it considers streets near the market safe.
+- **SARSA (on-policy):** It learns from the actions the agent actually takes, including random moves. It learns that staying near the market is risky and tries to keep its distance.
+
+This explains why SARSA crashes less often. However, it cannot completely prevent crashes.
+
+<div align="center">
+  <img src="./assets/figures/4_values_qlearning_vs_sarsa.png" alt="Learned values of Q-Learning and SARSA" width="60%">
+</div>
+
+
+
+### $\color{#E36209}{\textsf{Limitations}}$
+
+
+- **The safety shield needs a known environment.** It must know where the forbidden zones are and how the drone moves. This is easy in our case because the map is known and movements are predictable. With wind or unknown danger zones, building a reliable shield becomes harder.
+
+- **The risk-aware agent needs better exploration.** It found the best route in only 1 out of 5 runs because it did not explore one road enough to learn its value. Training longer or increasing the learning rate did not solve this. Better exploration methods, such as optimistic initialization, could help.
+
+- **The environment is small and predictable.** Our 16 × 16 grid has only 256 states, which makes comparing the agents easier. Real-world navigation is more complex and uncertain, so methods like DQN would be more suitable.
+
 
 <br>
 
