@@ -1,7 +1,12 @@
 """
     Testing the Environment Implmentation . 
 
-    python -m pytest tests -v
+    
+    # Run all tests
+        python -m pytest tests -v
+    
+    # Run individual test
+        python -m tests.test_env
 
 """
 

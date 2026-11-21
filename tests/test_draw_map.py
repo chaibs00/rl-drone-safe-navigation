@@ -1,7 +1,11 @@
 """
-    Testing the drawing function that draws the grid map and any route on top of it.
+    Testing the GridMap implementation.
 
-    python -m tests.check_map
+    # Run all tests
+        python -m pytest tests -v
+    
+    # Run individual test
+        python -m tests.test_draw_map
 """
 
 

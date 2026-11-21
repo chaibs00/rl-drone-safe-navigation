@@ -1,3 +1,16 @@
+"""
+    Testing the GridMap implementation.
+
+    # Run all tests
+        python -m pytest tests -v
+    
+    # Run individual test
+        python -m tests.test_grid_map
+"""
+
+
+
+
 from pathlib import Path
 
 from saferoute.environement.grid_map import Cell, GridMap
