@@ -24,7 +24,7 @@ The hypothesis this project tests: **penalties teach safety after the damage is 
 
 <div align="center">
 
-<img src="./assets/satelite-view.png" alt="Satellite view of the delivery area" width="50%">
+<img src="./assets/satelite-view.png" alt="Satellite view of the delivery area" width="80%">
 
 </div>
 
@@ -44,7 +44,7 @@ SafeRoute uses a **16 × 16 GridWorld** representing a small residential neighbo
 
 <div align="center">
 
-<img src="./assets/grid.png" alt="Grid representation of the environment" width="50%">
+<img src="./assets/grid.png" alt="Grid representation of the environment" width="80%">
 
 </div>
 
