@@ -116,9 +116,14 @@ def draw_values(grid_map, V, policy=None, ax=None, title=None):
     # Policy arrows
     if policy is not None:
         for state, action in enumerate(policy):
-            if action < 0:
-                continue
+            # if action < 0:
+            #     continue
+            # col, row = grid_map.to_pos(state)
+            
             col, row = grid_map.to_pos(state)
+            if action < 0 or blocked[row, col] or (col, row) == grid_map.goal:
+                continue                              # no arrow where the drone never decides
+
             d_col, d_row = ARROWS[int(action)]
             ax.arrow(col + 0.5 - 0.25 * d_col, row + 0.5 - 0.25 * d_row,
                      0.4 * d_col, 0.4 * d_row,
