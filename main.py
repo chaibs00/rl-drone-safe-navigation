@@ -9,13 +9,17 @@ Add --config to use another config file:
 
     # Run test before : 
         python -m pytest tests/test_train.py -v
+        python -m pytest tests/test_metrics.py -v
 
     # Then run main 
+        python main.py train
+        python main.py evaluate
 """
+
 
 import argparse
 
-from scripts import train
+from scripts import evaluate, train
 
 
 def main():
@@ -28,6 +32,8 @@ def main():
 
     if args.command == "train":
         train.main(args.config)
+    elif args.command == "evaluate":
+        evaluate.main(args.config)
     else:
         print(f"'{args.command}' is not implemented yet.")
 
