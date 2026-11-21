@@ -5,6 +5,8 @@
 The target uses the BEST next action (max), whatever action the agent
 actually takes next. That is what "off-policy" means: it learns the value
 of the greedy policy while behaving with an epsilon-greedy one.
+
+With a shield, the max is taken over the allowed (safe) actions only.
 """
 
 from saferoute.agents.base_agent import BaseAgent
@@ -16,9 +18,8 @@ class QLearningAgent(BaseAgent):
         if terminated:
             target = reward                                          # no future after goal or crash
         else:
-            target = reward + self.gamma * self.Q[next_state].max()  # best next action
+            best_next = self.Q[next_state, self.allowed_actions(next_state)].max()
+            target = reward + self.gamma * best_next                 # best ALLOWED next action
 
         td_error = target - self.Q[state, action]
         self.Q[state, action] += self.alpha * td_error
-
-        

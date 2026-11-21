@@ -4,6 +4,7 @@ What both agents have in common:
     - a Q-table of shape (n_states, n_actions), filled with zeros
     - an epsilon-greedy policy, with epsilon decreasing linearly over training
     - the episode loop (reset, act, step, learn)
+    - an optional safety shield that restricts the allowed actions
 
 What differs is only the update rule, written in the subclasses.
 """
@@ -15,7 +16,7 @@ class BaseAgent:
 
     def __init__(self, n_states, n_actions, alpha=0.1, gamma=0.99,
                  epsilon_start=1.0, epsilon_end=0.05, epsilon_decay_episodes=2000,
-                 seed=None):
+                 seed=None, shield=None):
         self.n_states = n_states
         self.n_actions = n_actions
         self.alpha = alpha
@@ -28,22 +29,30 @@ class BaseAgent:
 
         self.rng = np.random.default_rng(seed)
         self.Q = np.zeros((n_states, n_actions))
+        self.shield = shield                      # None = no shield
 
     # ------------------------------------------------------------------
     # Acting
     # ------------------------------------------------------------------
 
+    def allowed_actions(self, state):
+        """All actions, or only the safe ones if the agent has a shield."""
+        if self.shield is None:
+            return np.arange(self.n_actions)
+        return np.array(self.shield.allowed(state))
+
     def greedy_action(self, state):
-        """Best action for this state. Ties are broken at random."""
-        q_values = self.Q[state]
-        best = np.flatnonzero(q_values == q_values.max())
+        """Best allowed action for this state. Ties are broken at random."""
+        actions = self.allowed_actions(state)
+        q_values = self.Q[state, actions]
+        best = actions[q_values == q_values.max()]
         return int(self.rng.choice(best))
 
     def select_action(self, state):
-        """Epsilon-greedy: random action with probability epsilon, else the best one."""
+        """Epsilon-greedy over the allowed actions."""
         if self.rng.random() < self.epsilon:
-            return int(self.rng.integers(self.n_actions))    # explore
-        return self.greedy_action(state)                      # exploit
+            return int(self.rng.choice(self.allowed_actions(state)))   # explore
+        return self.greedy_action(state)                                # exploit
 
     def update_epsilon(self, episode):
         """Linear decay from epsilon_start to epsilon_end, then constant."""
@@ -52,7 +61,10 @@ class BaseAgent:
 
     def policy(self):
         """Greedy policy for every state (used to draw the learned route)."""
-        return np.argmax(self.Q, axis=1)
+        return np.array([
+            self.allowed_actions(s)[np.argmax(self.Q[s, self.allowed_actions(s)])]
+            for s in range(self.n_states)
+        ])
 
     # ------------------------------------------------------------------
     # Learning

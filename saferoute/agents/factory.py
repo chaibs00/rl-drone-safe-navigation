@@ -9,11 +9,12 @@ The config describes each agent as 1 algorithm + 2 switches:
       shielded:   {algorithm: q_learning, risk_costs: true,  shield: true}
 
 So building an agent means: pick the algorithm, build the environment with
-the right reward (risk_costs), and add the shield if asked (Step 8).
+the right reward (risk_costs), and add the shield if asked.
 """
 
 from saferoute.agents.q_learning import QLearningAgent
 from saferoute.agents.sarsa import SarsaAgent
+from saferoute.agents.shield import Shield
 from saferoute.environement.saferoute_env import SafeRouteEnv
 
 ALGORITHMS = {
@@ -36,9 +37,7 @@ def build_agent(name, config, seed=None):
         epsilon_start=t["epsilon_start"], epsilon_end=t["epsilon_end"],
         epsilon_decay_episodes=t["epsilon_decay_episodes"],
         seed=seed,
+        shield=Shield(env) if spec["shield"] else None,
     )
-
-    if spec["shield"]:
-        raise NotImplementedError("The shield is added in Step 8")
 
     return env, agent
