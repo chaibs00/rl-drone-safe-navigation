@@ -4,6 +4,9 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
 ![Gymnasium](https://img.shields.io/badge/Gymnasium-custom_env-0081A5?style=flat)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=flat)
+![pytest](https://img.shields.io/badge/pytest-42_tests-0A9EDC?style=flat&logo=pytest&logoColor=white)
 ![RL](https://img.shields.io/badge/Topic-Safe_Reinforcement_Learning-FF6F00?style=flat)
 
 </div>
@@ -13,15 +16,15 @@
 
 ### Table of Contents
 
-1. [Overview](#overview)
-2. [The Environment](#the-environment)
-3. [MDP Formulation](#mdp-formulation)
-4. [Rewards and Safety Costs](#rewards-and-safety-costs)
-5. [The Agents](#the-agents)
-6. [Evaluation](#evaluation)
-7. [Project Structure](#project-structure)
-8. [Results](#results)
-9. [References](#references)
+1. [Overview](#color1f6febtextsfoverview)
+2. [The Environment](#color1f6febtextsfthe-environment)
+3. [MDP Formulation](#color1f6febtextsfmdp-formulation)
+4. [Rewards and Safety Costs](#color1f6febtextsfrewards-and-safety-costs)
+5. [The Agents](#color1f6febtextsfthe-agents)
+6. [Evaluation](#color1f6febtextsfevaluation)
+7. [Project Structure](#color1f6febtextsfproject-structure)
+8. [Results](#color1f6febtextsfresults)
+9. [References](#color1f6febtextsfreferences)
 
 <br>
 
