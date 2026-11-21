@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 Steps.md
 .vscode/
+
 results/
 
 # C extensions

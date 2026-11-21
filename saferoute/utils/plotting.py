@@ -141,3 +141,41 @@ def draw_values(grid_map, V, policy=None, ax=None, title=None):
     if title:
         ax.set_title(title, pad=30)
     return ax
+
+
+
+
+# ========================== After defining all agents ==================================
+# ----------------------------------------------------------------------
+# Result plots (Step 11)
+# ----------------------------------------------------------------------
+
+# One label and color per agent, used in every result figure
+AGENT_STYLE = {
+    "q_learning": ("Q-Learning", "#1F6FEB"),
+    "sarsa":      ("SARSA", "#E36209"),
+    "risk_aware": ("Risk-aware Q-Learning", "#8250DF"),
+    "shielded":   ("Shielded Q-Learning", "#1A7F37"),
+}
+
+
+def moving_average(values, window):
+    return np.convolve(values, np.ones(window) / window, mode="valid")
+
+
+def plot_mean_and_band(ax, curves, name):
+    """Plot the mean of several seeds as a line, and the min-max range as a band."""
+    label, color = AGENT_STYLE[name]
+    curves = np.asarray(curves, dtype=float)
+    x = np.arange(curves.shape[1])
+    ax.plot(x, curves.mean(axis=0), color=color, label=label, linewidth=2)
+    ax.fill_between(x, curves.min(axis=0), curves.max(axis=0), color=color, alpha=0.15)
+
+
+def style_axis(ax, title, xlabel, ylabel):
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(alpha=0.3)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.legend(frameon=False)

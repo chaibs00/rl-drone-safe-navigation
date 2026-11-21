@@ -19,7 +19,7 @@ Add --config to use another config file:
 
 import argparse
 
-from scripts import evaluate, train
+from scripts import evaluate, plot_results_final, train
 
 
 def main():
@@ -34,8 +34,8 @@ def main():
         train.main(args.config)
     elif args.command == "evaluate":
         evaluate.main(args.config)
-    else:
-        print(f"'{args.command}' is not implemented yet.")
+    elif args.command == "plot":
+        plot_results_final.main(args.config)
 
 
 if __name__ == "__main__":
