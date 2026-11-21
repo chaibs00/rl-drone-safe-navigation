@@ -1,0 +1,37 @@
+# ==========================================================
+# SafeRoute - default configuration
+# Every number used by the project lives here.
+# ==========================================================
+
+env:
+  map_path: maps/saferoute_16x16.txt
+  max_steps: 200            # H: episode limit (timeout)
+
+rewards:
+  goal: 100                 # reach the destination
+  step: -1                  # every move
+  crash: -100               # enter a high-risk cell (episode ends)
+  medium_risk: -5           # risk cost, risk-aware agents only
+  low_risk: -2              # risk cost, risk-aware agents only
+
+training:
+  episodes: 3000
+  alpha: 0.1                # learning rate
+  gamma: 0.99               # discount factor
+  epsilon_start: 1.0        # fully random at the beginning
+  epsilon_end: 0.05         # small exploration at the end
+  epsilon_decay_episodes: 2000   # epsilon decreases linearly over these episodes
+  seeds: [0, 1, 2, 3, 4]
+
+# The 4 agents = 2 algorithms + 2 switches
+agents:
+  q_learning: {algorithm: q_learning, risk_costs: false, shield: false}
+  sarsa:      {algorithm: sarsa,      risk_costs: false, shield: false}
+  risk_aware: {algorithm: q_learning, risk_costs: true,  shield: false}
+  shielded:   {algorithm: q_learning, risk_costs: true,  shield: true}
+
+value_iteration:
+  theta: 1.0e-6             # stop when values change less than this
+
+paths:
+  results_dir: results
